@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>proxy Document</title>
+</head>
+
+<body>
+    <input id="input" />
+    <div id="app"></div>
+</body>
+<script>
+
+    // 正则校验
+    const validtor = {
+        name: function (value) {
+            if (value) {
+                return true
+            } else {
+                return false
+            }
+        },
+        age_num: function (value) {
+            if(typeof value == 'number'){
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+    let input = document.querySelector("#input");
+    let vue = new Vue("徐鑫鑫",0);
+    input.onkeydown = function (e) {
+        vue.age_num = e.target.value;
+    }
+    let data = { name: '', age_num: "" };
+    function Vue(name,age_num) {
+        this.name = name;
+        this.age_num = age_num;
+        return new Proxy(this, {
+            get: function (target, key, receiver) {
+                return target[key]
+            },
+            set: function (target, key, value, receiver) {
+                if(validtor[key](value)){
+                    return Reflect.set(target, key, value)
+                } else {
+                    throw new Error(key + "的数据校验失败")
+                }
+            }
+        })
+    }
+
+
+</script>
+
+</html>

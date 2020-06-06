@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>原生js 贪吃蛇 </title>
+    <link rel="stylesheet" href="./css/index.css">
+</head>
+
+<body>
+    <div id="main">
+        <input type="button" value="开始游戏" class="btn" id="begin">
+        <input type="button" value="暂停游戏" class="btn" id="end">
+    </div>
+    <script>
+        var timer;
+        var showCanvas = true;
+        var main = document.getElementById('main');
+        function Map(atom, xnum, ynum) {
+
+            this.atom = atom;
+            this.xnum = xnum;
+            this.ynum = ynum;
+            this.canvas = null;
+
+            // 创建画图的方法
+            this.create = function () {
+                this.canvas = document.createElement("div");
+                this.canvas.style.cssText = "position:relative;top:40px;left:0;border:1px solid darkred;background:#fafafa";
+                this.canvas.style.width = this.xnum * this.atom + "px";
+                this.canvas.style.height = this.ynum * this.atom + "px";
+                main.appendChild(this.canvas)
+                if (showCanvas) {
+                    for (var y = 0; y < this.ynum; y++) {
+                        for (var x = 0; x < this.xnum; x++) {
+                            var a = document.createElement("div");
+                            a.style.cssText = "position:absolute;border:1px solid yellow;background:green";
+                            a.style.width = this.atom + "px";
+                            a.style.height = this.atom + "px";
+                            a.style.top = this.atom * y + "px";
+                            a.style.left = this.atom * x + "px";
+                            this.canvas.appendChild(a);
+                        }
+                    }
+                }
+            }
+        }
+        // 创建 食物
+
+        function Food(map) {
+
+            this.width = map.atom;
+            this.height = map.atom;
+            // this.bgcolor = `rgb(${Math.floor(Math.random*200)},${Math.floor(Math.random*200)},${Math.floor(Math.random*200)})`;
+            this.bgcolor = `red`;
+
+            this.x = Math.floor(Math.random() * map.xnum);
+            this.y = Math.floor(Math.random() * map.ynum);
+
+            this.flag = document.createElement("div");
+            this.flag.style.width = this.width + 'px';
+            this.flag.style.height = this.height + 'px';
+
+            this.flag.style.backgroundColor = this.bgcolor;
+            this.flag.style.position = 'absolute';
+            this.flag.style.left = this.x * map.atom + 'px';
+            this.flag.style.top = this.y * map.atom + 'px';
+
+            map.canvas.appendChild(this.flag)
+
+
+        }
+        // 创建🐍 
+
+        function Snack(map) {
+
+            this.width = map.atom;
+            this.height = map.atom;
+            // 默认出发方向
+
+            this.direction = 'down';
+
+            this.body = [
+                { x: 2, y: 0 },
+                { x: 1, y: 0 },
+                { x: 0, y: 0 },
+            ]
+
+            this.snackList = [];
+
+            this.display = function () {
+                for (var i = 0; i < this.body.length; i++) {
+                    if (this.body[i].x != null) {
+                        var a = document.createElement("div");
+                        a.style.cssText = `position:absolute;background:${i == 0 ? 'red' : 'yellow'}`;
+                        a.style.width = this.width + "px";
+                        a.style.height = this.height + "px";
+                        a.style.top = this.body[i].y * this.height + "px";
+                        a.style.left = this.body[i].x * this.width + "px";
+                        this.body[i].node = a;
+                        map.canvas.appendChild(a)
+                    }
+
+                }
+
+            }
+
+            this.run = function () {
+
+                for (var i = this.body.length - 1, len = this.body.length; i > 0; i--) {
+                    this.body[i].x = this.body[i - 1].x;
+                    this.body[i].y = this.body[i - 1].y;
+                }
+
+
+
+                switch (this.direction) {
+                    case 'right': this.body[0].x += 1; break;
+                    case 'left': this.body[0].x -= 1; break;
+                    case 'up': this.body[0].y -= 1; break;
+                    case 'down': this.body[0].y += 1; break;
+                }
+
+                // 判断蛇头 吃掉食物
+
+                if (this.body[0].x == food.x && this.body[0].y == food.y) {
+                    this.body.push({
+                        x: null, y: null, node: null
+                    })
+                    console.log(this.body)
+                    map.canvas.removeChild(food.flag);
+                    food = new Food(map)
+                }
+
+
+                // 是否出街
+
+                if (this.body[0].x > map.xnum - 1 || this.body[0].x < 0 || this.body[0].y > map.ynum - 1 || this.body[0].y < 0) {
+                    clearInterval(timer)
+                    alert(`游戏结束，得分${this.body.length - 3}分`);
+                    restart(map, this)
+                    return
+                }
+
+                // 自杀
+
+                for (var i = 4; i < this.body.length; i++) {
+                    if (this.body[0].x == this.body[i].x) {
+                        clearInterval(timer)
+                        alert(`游戏结束，已经自杀`);
+                        restart(map, this)
+                        return
+                    }
+                }
+
+                for (var i = 0, len = this.body.length; i < len; i++) {
+                    if (this.body[i].node != null) {
+                        map.canvas.removeChild(this.body[i].node)
+                    }
+                }
+
+
+
+                this.display()
+            }
+
+  
+
+        }
+
+
+
+        // 重新开发
+        function restart(map, snack) {
+            for (var i = 0; i < snack.body.length; i++) {
+                map.canvas.removeChild(snack.body[i].node);
+            }
+            snack.body = [
+                { x: 2, y: 0 },
+                { x: 1, y: 0 },
+                { x: 0, y: 0 },
+            ]
+            snack.direction = 'right';
+            snack.display();
+            map.canvas.removeChild(food.flag);
+
+            food = new Food(map)
+        }
+
+
+
+        var map = new Map(20, 25, 25);
+        map.create();
+        var food = new Food(map);
+        var snack = new Snack(map);
+        snack.display();
+
+        window.onkeydown = function () {
+            var e = e || window.event;
+            switch (e.keyCode) {
+                case 38:
+                    if (snack.direction != "down") {
+                        snack.direction = 'up';
+                    }
+                    break;
+                case 40:
+                    if (snack.direction != "up") {
+                        snack.direction = 'down';
+                    }
+                    break;
+                case 37:
+                    if (snack.direction != "right") {
+                        snack.direction = 'left';
+                    }
+                    break;
+                case 39:
+                    if (snack.direction != "left") {
+                        snack.direction = 'right';
+                    }
+                    break;
+
+            }
+        }
+
+        document.querySelector("#begin").onclick = function () {
+            clearInterval(timer)
+            timer = setInterval(function () {
+                snack.run();
+            }, 300);
+        }
+        document.querySelector("#end").onclick = function () {
+            clearInterval(timer)
+        }
+    </script>
+</body>
+
+</html>
