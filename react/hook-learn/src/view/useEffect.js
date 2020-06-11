@@ -16,7 +16,7 @@ export default () => {
 
     const [count, setCount] = useState(0);
     const [name, setName] = useState(() => {
-        return "徐鑫鑫"
+        return "徐鑫鑫 "
     });
 
 
