@@ -1,0 +1,33 @@
+p{background-color: #D9D9D9; }
+.parents{
+  width: 840px;
+  margin: 100px auto;
+}
+.title{
+  text-align: left;
+  padding:0;
+  margin: 0;
+  text-indent: 2em;
+  height: 38px;
+  line-height: 38px;
+  color: #333333;
+}
+
+.printSheet{
+    width: 840px;
+    margin: -1px auto 0;
+    border-left: 2px solid #D9D9D9;
+    border-right: 2px solid #D9D9D9;
+    border-collapse: collapse;
+    table-layout: fixed
+}
+.printSheet td{
+    position: relative;
+    height: 38px;
+    border: 1px solid #D9D9D9;
+    font-size: 16px;
+    text-align: center;
+    color: #000;
+    word-break: break-all;
+    vertical-align: middle; 
+}

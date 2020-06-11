@@ -146,7 +146,7 @@
                 // 自杀
 
                 for (var i = 4; i < this.body.length; i++) {
-                    if (this.body[0].x == this.body[i].x) {
+                    if (this.body[0].x == this.body[i].x &&this.body[0].y == this.body[i].y) {
                         clearInterval(timer)
                         alert(`游戏结束，已经自杀`);
                         restart(map, this)
